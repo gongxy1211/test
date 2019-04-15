@@ -23,9 +23,9 @@ def getIdlist(projectId,id):
 def getTid(groupid):
     TidList=[]
     if groupid!=None:
-        data_1 = session.get("http://183.131.202.93:9071/api/interface/list_cat?catid=" + str(groupid)).json()["data"]
-        print("getTid")
-        print(data_1)
+        data_1 = session.get("http://183.131.202.93:9071/api/interface/list_cat?page=1&limit=200&catid=" + str(groupid)).json()["data"]
+        #print("getTid")
+        #print(data_1)
         if data_1["list"]!=[]:
             for list in data_1["list"]:
                 TidList.append(list["_id"])
@@ -78,7 +78,7 @@ def save_file(dirname,filename, content):
     tempPath=dirname
     targetPath=curPath+os.path.sep+tempPath #"os.path.sep"相当于"/"
     #targetPath=curPath+'/'+tempPath
-    print(targetPath)
+    #print(targetPath)
     if not os.path.exists(targetPath):#判断路径是否已经存在
         os.makedirs(targetPath)
     else:
@@ -102,10 +102,8 @@ def getModuleName(projectID):
     return modules
 
 #***********************************************************************************************************************************************#
-
 projectId="35"#传递需要的参数
 id=None
-
 session=requests.session()#可获取请求头参数
 formdata={
     "email": "gongxy@zjbdos.com",
@@ -113,7 +111,6 @@ formdata={
 }
 src=session.post("http://183.131.202.93:9071/api/user/login",formdata)
 #登陆
-
 #*******************************************************************************************************#
 items=[]
 getList=[]
@@ -121,7 +118,7 @@ getList.extend(getIdlist(projectId,id))
 #print(getList)
 for ApiId in getList:
     items.append(getApiInfo(ApiId))
-print(items[1])
+#print(items[1])
 #print(items)
 #print(len(items))
     #print(getApiInfo(ApiId))
@@ -137,12 +134,12 @@ def {{item['api_name']}}(self{% for a in item['args']%}, {{a}}{% endfor %}):
         }
     return {'json': json, 'headers': self.headers}
 {% endfor -%}
-'''
+'''#创建pytest接口
 #{%for %}{%endfor-%}for循环语句
 #{{}}传递参数
 content1=Template(template1).render(items=items)#初始化template，并传递参数items
 #print(content1)#输出结果
-print("总共生成{}个接口".format(len(items)))
+#print("总共生成{}个接口".format(len(items)))
 filename="ApiTest"+".py"
 dirname1="name"
 save_file(dirname1,filename,content1)
@@ -158,8 +155,8 @@ for  module in modules:
 
         for api in getTid(module["_id"]):
             actions.append(getApiInfo(api))#获取每个接口的接口详情
-        print("action")
-        print(actions)
+        #print("action")
+        #print(actions)
     else:
         pass
 
@@ -187,11 +184,12 @@ class Test_{{ name }}:
         assert res_json['code'] == 0, "code校验_【{{ item['comment'] }}】 " + "请求链接为：" + res.request.url
 
 '''
-        print(item)
+        #print(item)
         content2=Template(script_template).render(item=item,name="".join(name),arg=",".join(args))
         filename="test_" + item["api_name"] + ".py"
         save_file(dirname,filename,content2)
-        print(content2)
+        #print(content2)
+   # print(len(actions))
 
 
 
